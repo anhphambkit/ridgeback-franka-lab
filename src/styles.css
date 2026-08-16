@@ -1,0 +1,21 @@
+:root {
+  color: #e7f0eb;
+  background: #07100e;
+  font-family: system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body, #root {
+  width: 100%; min-width: 320px; min-height: 100%; margin: 0;
+}
+body { min-height: 100vh; }
+.app-shell { min-height: 100vh; }
+.topbar {
+  height: 64px; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 24px;
+  border-bottom: 1px solid #294139;
+}
+.topbar a { color: #a9bbb4; margin-left: 20px; }
+.topbar a.active { color: #d9ff68; }
+.placeholder {
+  height: calc(100vh - 64px); display: grid; place-items: center;
+}
