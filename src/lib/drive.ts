@@ -50,7 +50,9 @@ export function stepDrive(
     const steering = clamp(input.steering, -1, 1)
     const targetLinear = throttle * limits.maxLinear
     const targetAngular = steering * limits.maxAngular
-    const wheels = twistToWheelSpeeds(targetLinear, targetAngular, limits)
+    const rampedLinear = approach(state.linear, targetLinear, limits.linearAcceleration * safeDt)
+    const rampedAngular = approach(state.angular, targetAngular, limits.angularAcceleration * safeDt)
+    const wheels = twistToWheelSpeeds(rampedLinear, rampedAngular, limits)
     const { linear, angular } = wheelSpeedsToTwist(wheels, limits)
     const yaw = state.yaw + angular * safeDt
     return {
@@ -59,4 +61,10 @@ export function stepDrive(
         yaw, linear, angular,
         leftWheel: wheels.left, rightWheel: wheels.right
     }
+}
+
+export function approach(current: number, target: number, maxDelta: number) {
+    if (current < target) return Math.min(current + maxDelta, target)
+    if (current > target) return Math.max(current - maxDelta, target)
+    return current
 }
