@@ -63,3 +63,32 @@ body { min-height: 100vh; }
 @media (max-width: 900px) {
   .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+.renderer-panel {
+  position: absolute;
+  z-index: 1;
+  top: 16px;
+  right: 16px;
+  width: 210px;
+  padding: 14px;
+  color: #e7f0eb;
+  background: rgba(8, 20, 16, 0.86);
+  border: 1px solid #365347;
+  border-radius: 8px;
+}
+.renderer-panel h2 {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+.renderer-panel h2 small {
+  color: #79eaae;
+  font-weight: normal;
+}
+.renderer-panel dl { margin: 0; }
+.renderer-panel dl div {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+.renderer-panel dt { color: #9aafa6; font-size: 11px; }
+.renderer-panel dd { margin: 0; font-family: monospace; }
