@@ -1,41 +1,40 @@
 import { useGLTF } from '@react-three/drei'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Object3D, Quaternion } from 'three'
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import modelUrl from '../../ridgeback_franka.optimized.glb?url'
-import { JOINTS } from '../config/joints'
+import { JOINTS, normalizeJointPose, type JointPose } from '../config/joints'
 
-type Props = { joints?: number[] }
+type Props = { joints?: JointPose }
 
 export function RobotModel({ joints }: Props) {
   const gltf = useGLTF(modelUrl)
-  const scene = useMemo(() => clone(gltf.scene), [gltf.scene])
-  const restQuaternions = useRef(new Map<string, Quaternion>())
-
-  useEffect(() => {
+  const model = useMemo(() => {
+    const scene = clone(gltf.scene)
+    const restQuaternions = new Map<string, Quaternion>()
     JOINTS.forEach(({ node }) => {
       const part = scene.getObjectByName(node)
-      if (part && !restQuaternions.current.has(node)) {
-        restQuaternions.current.set(node, part.quaternion.clone())
-      }
+      if (!part) throw new Error(`Robot model is missing required node: ${node}`)
+      restQuaternions.set(node, part.quaternion.clone())
     })
-  }, [scene])
+    return { scene, restQuaternions }
+  }, [gltf.scene])
 
   useEffect(() => {
-    if (!joints) return
+    const pose = joints ? normalizeJointPose(joints) : undefined
 
     JOINTS.forEach(({ node, axis }, index) => {
-      const part = scene.getObjectByName(node)
-      const rest = restQuaternions.current.get(node)
+      const part = model.scene.getObjectByName(node)
+      const rest = model.restQuaternions.get(node)
       if (!part || !rest) return
 
-      const angle = (joints[index] * Math.PI) / 180
+      const angle = ((pose?.[index] ?? 0) * Math.PI) / 180
       const jointRotation = new Quaternion().setFromAxisAngle(axis, angle)
       part.quaternion.copy(rest).multiply(jointRotation)
     })
-  }, [joints, scene])
+  }, [joints, model])
 
-  return <primitive object={scene as Object3D} />
+  return <primitive object={model.scene as Object3D} />
 }
 
 useGLTF.preload(modelUrl)

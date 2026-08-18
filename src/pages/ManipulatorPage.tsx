@@ -3,12 +3,11 @@ import { Canvas } from '@react-three/fiber'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { Group, Vector3 } from 'three'
 import { RobotModel } from '../components/RobotModel'
-import { JOINTS } from '../config/joints'
+import { SceneBoundary } from '../components/SceneBoundary'
+import { DEMO_POSE, HOME_POSE, JOINTS, normalizeJointPose, type JointPose } from '../config/joints'
 import { World } from '../components/World'
 
-const homePose = [0, 0, 0, -45, 0, 90]
-
-function ManipulatorScene({ joints }: { joints: number[] }) {
+function ManipulatorScene({ joints }: { joints: JointPose }) {
   const robot = useRef<Group>(null)
   const [tip, setTip] = useState<[number, number, number]>([0, 0, 0])
   const signature = joints.join(',')
@@ -30,8 +29,12 @@ function ManipulatorScene({ joints }: { joints: number[] }) {
 }
 
 export function ManipulatorPage() {
-  const [joints, setJoints] = useState(homePose)
-  const updateJoint = (index: number, value: number) => setJoints((current) => current.map((angle, i) => i === index ? value : angle))
+  const [joints, setJoints] = useState<JointPose>(() => [...HOME_POSE])
+  const updateJoint = (index: number, value: number) => setJoints((current) => {
+    const next = [...current]
+    next[index] = value
+    return normalizeJointPose(next)
+  })
 
   return <section className="page-layout manipulator-layout">
     <aside className="side-panel joint-panel">
@@ -46,14 +49,16 @@ export function ManipulatorPage() {
         </label>)}
       </div>
       <div className="button-row">
-        <button className="reset-button" onClick={() => setJoints([...homePose])}>Home pose</button>
-        <button className="ghost-button" onClick={() => setJoints([35, -40, 60, -110, 45, 120])}>Demo pose</button>
+        <button className="reset-button" onClick={() => setJoints([...HOME_POSE])}>Home pose</button>
+        <button className="ghost-button" onClick={() => setJoints([...DEMO_POSE])}>Demo pose</button>
       </div>
     </aside>
     <div className="viewport-wrap">
-      <Canvas dpr={[1, 1.5]} camera={{ position: [3.4, 2.8, -4.2], fov: 38 }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
-        <Suspense fallback={null}><World><ManipulatorScene joints={joints} /></World></Suspense>
-      </Canvas>
+      <SceneBoundary>
+        <Canvas dpr={[1, 1.5]} camera={{ position: [3.4, 2.8, -4.2], fov: 38 }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
+          <Suspense fallback={<Html center className="scene-loader">Loading robot</Html>}><World><ManipulatorScene joints={joints} /></World></Suspense>
+        </Canvas>
+      </SceneBoundary>
       <div className="viewport-label">LIVE / ARM_FK</div>
       <div className="chain-panel glass-panel">
         <div className="panel-title"><span>Kinematic chain</span><i>GLB nodes</i></div>

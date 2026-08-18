@@ -1,4 +1,6 @@
-import { Vector3 } from 'three'
+import { MathUtils, Vector3 } from 'three'
+
+export type JointPose = [number, number, number, number, number, number]
 
 export const JOINTS = [
   {
@@ -44,3 +46,18 @@ export const JOINTS = [
     max: 215,
   },
 ] as const
+
+export const HOME_POSE: JointPose = [0, 0, 0, -45, 0, 90]
+export const DEMO_POSE: JointPose = [35, -40, 60, -110, 45, 120]
+
+export function normalizeJointPose(pose: readonly number[]): JointPose {
+  return JOINTS.map((joint, index) => {
+    const value = pose[index]
+    const fallback = HOME_POSE[index]!
+    return MathUtils.clamp(
+      typeof value === 'number' && Number.isFinite(value) ? value : fallback,
+      joint.min,
+      joint.max,
+    )
+  }) as JointPose
+}
