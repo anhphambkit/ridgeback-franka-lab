@@ -5,7 +5,7 @@ Record a 60–90 second walkthrough after `npm test`, `npm run lint`, and `npm r
 ## Preparation
 
 1. Run `npm run dev -- --host 127.0.0.1 --port 5173`.
-2. Open `http://127.0.0.1:5173/drive` in a clean browser window.
+2. Open `http://127.0.0.1:5173/#/drive` in a clean browser window.
 3. Hide bookmarks and unrelated browser UI, or enter full-screen mode.
 4. Confirm the robot model, telemetry panel, and renderer panel are visible.
 5. Close developer tools unless you explicitly want to show a clean console at the end.

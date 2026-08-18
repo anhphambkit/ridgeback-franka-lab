@@ -4,9 +4,9 @@ Interactive React + Three.js demonstration using the supplied `ridgeback_franka.
 
 ## Features
 
-- Differential-drive controls with arrow keys, velocity limits, acceleration ramps, trail, telemetry, and renderer statistics.
+- Differential-drive controls with keyboard and touch input, velocity limits, acceleration ramps, camera follow, trail, telemetry, and renderer statistics.
 - Physical left/right wheel angular velocities derived from wheel radius and axle track.
-- Six-joint forward-kinematics controls using the GLB's preserved node hierarchy.
+- Validated six-joint forward-kinematics controls using the GLB's preserved node hierarchy.
 - Responsive two-page interface with orbit controls.
 - Pure, unit-tested drive integration logic.
 - Design notes for [emergency stopping](docs/EMERGENCY_STOP.md) and [instancing](docs/INSTANCING.md).
@@ -37,6 +37,8 @@ The demo pose changes all six joint values and updates the displayed TCP world p
 npm install
 npm run dev
 ```
+
+Open `http://127.0.0.1:5173/#/drive`. Hash-based routing and relative asset paths keep both simulation routes compatible with static hosting.
 
 Quality checks:
 
