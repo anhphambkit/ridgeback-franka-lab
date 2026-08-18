@@ -16,7 +16,7 @@ export default function App() {
           <NavLink to="/drive">01 · Mobile base</NavLink>
           <NavLink to="/manipulator">02 · Manipulator</NavLink>
         </nav>
-        <span className="system-status"><i /> Simulation ready</span>
+        <span className="system-status"><i /> Simulation workspace</span>
       </header>
       <main>
         <Suspense fallback={<div className="route-loader"><span>Loading simulation</span></div>}>
