@@ -17,13 +17,12 @@ describe('differential drive', () => {
     })
 
     it('clamps input and respects velocity limits', () => {
-        const next = stepDrive(
-            stopped, { throttle: 99, steering: -99 }, 0.1,
-        )
-        expect(Math.abs(next.linear))
-            .toBeLessThanOrEqual(DEFAULT_LIMITS.maxLinear)
-        expect(Math.abs(next.angular))
-            .toBeLessThanOrEqual(DEFAULT_LIMITS.maxAngular)
+        let current = stopped
+        for (let index = 0; index < 100; index += 1) {
+            current = stepDrive(current, { throttle: 99, steering: -99 }, 0.1)
+        }
+        expect(current.linear).toBeCloseTo(DEFAULT_LIMITS.maxLinear)
+        expect(current.angular).toBeCloseTo(-DEFAULT_LIMITS.maxAngular)
     })
 
     it('round-trips wheel and base velocities', () => {
@@ -56,5 +55,11 @@ describe('differential drive', () => {
             moving, { throttle: 0, steering: 0 }, 0.1,
         )
         expect(next.linear).toBeCloseTo(0.91)
+    })
+
+    it('caps a delayed frame to one tenth of a second', () => {
+        const delayed = stepDrive(stopped, { throttle: 1, steering: 1 }, 10)
+        const bounded = stepDrive(stopped, { throttle: 1, steering: 1 }, 0.1)
+        expect(delayed).toEqual(bounded)
     })
 })
