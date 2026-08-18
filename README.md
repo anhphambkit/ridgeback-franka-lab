@@ -11,6 +11,27 @@ Interactive React + Three.js demonstration using the supplied `ridgeback_franka.
 - Pure, unit-tested drive integration logic.
 - Design notes for [emergency stopping](docs/EMERGENCY_STOP.md) and [instancing](docs/INSTANCING.md).
 - A measured [performance review](docs/PERFORMANCE.md) with baseline and optimized results.
+- A complete [Vietnamese handbook](docs/HANDBOOK_VI.md) covering all commits, components, functions, robotics concepts, and current limitations.
+
+## Screenshots
+
+### Mobile base simulation
+
+![Mobile base differential-drive simulation with telemetry and renderer statistics](docs/screenshots/mobile-base.png)
+
+### Manipulator forward kinematics
+
+| Home pose | Demo pose |
+| --- | --- |
+| ![Franka manipulator home pose](docs/screenshots/manipulator-home.png) | ![Franka manipulator demo pose](docs/screenshots/manipulator-demo.png) |
+
+The demo pose changes all six joint values and updates the displayed TCP world position.
+
+## Video demo
+
+[![Ridgeback / Franka simulation video](docs/video/ridgeback-franka-demo-poster.jpg)](docs/video/ridgeback-franka-demo.mp4)
+
+[Watch or download the 65-second MP4 demo](docs/video/ridgeback-franka-demo.mp4). It demonstrates keyboard-controlled base motion, live telemetry and renderer metrics, a figure-eight trajectory trail, navigation to the manipulator page, manual joint-slider changes, and TCP updates. The repository copy is compressed to 1920 × 1044 and intentionally contains no audio. For an alternative narrated submission recording, follow the [video recording checklist](docs/DEMO_VIDEO.md).
 
 ## Run locally
 
@@ -28,6 +49,17 @@ npm run build
 ```
 
 The JS heap metric is only exposed by browsers that implement `performance.memory` (primarily Chromium); other browsers display `N/A`.
+
+## Extending the simulation
+
+- Change velocity, acceleration, wheel radius, or axle-track parameters in `src/lib/drive.ts`. Keep the motion equations pure and add matching cases to `src/lib/drive.test.ts`.
+- Add or adjust manipulator joints in `src/config/joints.ts`. Each entry maps a GLB node name to its local rotation axis and slider limits.
+- Extend model behavior in `src/components/RobotModel.tsx`. Preserve the original rest quaternions and GLB parent/child hierarchy so joint rotations do not accumulate or detach child links.
+- Add shared lights, controls, or scene helpers in `src/components/World.tsx`.
+- Add a simulation page under `src/pages`, then register its lazy route and top-navigation link in `src/App.tsx`.
+- When replacing the source GLB, run `npm run optimize:model`, verify that `Link1` through `Hand` still exist, and test both routes before committing the optimized asset.
+
+Prefer extracting new calculations into framework-independent functions. This keeps the WebGL components focused on rendering and makes the behavior straightforward to unit-test without a browser.
 
 ## Differential-drive model
 
