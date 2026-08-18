@@ -25,7 +25,9 @@ function DriveSimulation({ resetToken, onTelemetry, onStats }: {
   const keys = useKeyboardDrive()
   const state = useRef<DriveState>({ ...initialDrive })
   const points = useRef<Vector3Tuple[]>([[0, 0.035, 0]])
-  const [trail, setTrail] = useState<Vector3Tuple[]>(points.current)
+  const [trail, setTrail] = useState<Vector3Tuple[]>(
+    () => [[0, 0.035, 0]],
+  )
   const lastTrail = useRef(0)
   const elapsedTime = useRef(0)
   const lastUi = useRef(0)
