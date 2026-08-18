@@ -21,7 +21,6 @@ function ManipulatorScene({ joints }: { joints: number[] }) {
       setTip([world.x, world.y, world.z])
     })
     return () => cancelAnimationFrame(frame)
-  // The serialized pose re-computes the TCP after any joint changes.
   }, [signature])
 
   return <group ref={robot}>
