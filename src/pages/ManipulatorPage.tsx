@@ -94,7 +94,7 @@ export function ManipulatorPage() {
       </aside>
 
       <div style={{ minWidth: 0, minHeight: 0 }}>
-        <Canvas camera={{ position: [3.4, 2.8, -4.2], fov: 38 }}>
+        <Canvas camera={{ position: [3.4, 2.8, -4.2], fov: 38 }} dpr={[1, 1.5]} gl={{ antialias: true, powerPreference: 'high-performance' }}>
           <Suspense fallback={null}>
             <World>
               <ManipulatorScene joints={joints} />

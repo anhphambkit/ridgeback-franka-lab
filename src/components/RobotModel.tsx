@@ -2,7 +2,7 @@ import { useGLTF } from '@react-three/drei'
 import { useEffect, useMemo, useRef } from 'react'
 import { Object3D, Quaternion } from 'three'
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
-import modelUrl from '../../ridgeback_franka.glb?url'
+import modelUrl from '../..//ridgeback_franka.optimized.glb?url'
 import { JOINTS } from '../config/joints'
 
 type Props = { joints?: number[] }

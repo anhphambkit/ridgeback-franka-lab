@@ -167,7 +167,7 @@ export function DrivePage() {
         Reset simulation
       </button>
 
-      <Canvas camera={{ position: [5, 4.2, -6], fov: 42 }}>
+      <Canvas camera={{ position: [5, 4.2, -6], fov: 42 }} dpr={[1, 1.5]} gl={{ antialias: true, powerPreference: 'high-performance' }}>
         <Suspense fallback={null}>
           <World>
             <DriveSimulation

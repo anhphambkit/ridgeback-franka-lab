@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "vitest run",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "optimize:model": "gltf-transform optimize ridgeback_franka.glb ridgeback_franka.optimized.glb --compress meshopt --flatten false --join false --instance false --simplify false --palette false --texture-compress false"
   },
   "dependencies": {
     "@react-three/drei": "10.7.6",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@gltf-transform/cli": "4.4.2",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
