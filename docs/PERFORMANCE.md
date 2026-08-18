@@ -37,7 +37,15 @@ Measured again on the same desktop development viewport after optimization:
 | Idle FPS | not recorded in the original panel | 60 | device-specific |
 | Smoothed frame time | not recorded in the original panel | 16.7 ms | device-specific |
 
-The initial monolithic JavaScript output was approximately 1.28 MB (365 KB gzip). The optimized build now emits a 233 KB entry, 26 KB drive page, 10 KB manipulator page, and a 957 KB shared WebGL chunk. On the drive route this totals approximately 1.22 MB before gzip and 343 KB gzip, with the manipulator UI loaded only when visited.
+### Visual comparison
+
+![Before and after optimization: GLB size, geometry count, draw calls, and triangles](assets/performance/optimization-before-after.svg)
+
+The initial monolithic JavaScript output was approximately 1.28 MB (365 KB gzip). The current build emits an approximately 231 KB entry, 28 KB drive page, 3 KB manipulator page, and a 948 KB shared WebGL chunk. On the drive route this totals approximately 1.21 MB before gzip, with the manipulator UI loaded only when visited.
+
+### Bundle split
+
+![Production JavaScript bundle boundaries shared by the Drive and Manipulator routes](assets/performance/bundle-split.svg)
 
 The triangle and draw-call counts remain stable because Meshopt changes transfer/storage efficiency, not visual complexity. This is intentional: aggressive mesh joining or simplification could break joint transforms or visibly alter the assessment model.
 

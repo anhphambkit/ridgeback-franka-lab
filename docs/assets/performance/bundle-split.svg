@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="470" viewBox="0 0 1200 470" role="img" aria-labelledby="title desc">
+  <title id="title">Production JavaScript bundle split</title>
+  <desc id="desc">A shared entry and WebGL runtime feed two lazy route chunks: Drive and Manipulator.</desc>
+  <rect width="1200" height="470" fill="#091310"/>
+  <text x="60" y="68" fill="#eff8f2" font-family="Arial, sans-serif" font-size="30" font-weight="700">Production bundle boundaries</text>
+  <text x="60" y="100" fill="#789389" font-family="Arial, sans-serif" font-size="16">Shared runtime loads once; route-specific UI is requested on demand</text>
+  <rect x="70" y="160" width="245" height="108" rx="8" fill="#14251f" stroke="#496158"/>
+  <text x="94" y="196" fill="#d9ff68" font-family="Arial, sans-serif" font-size="14" font-weight="700">ENTRY</text>
+  <text x="94" y="232" fill="#eff8f2" font-family="Arial, sans-serif" font-size="26" font-weight="700">231.16 KB</text>
+  <text x="94" y="254" fill="#789389" font-family="Arial, sans-serif" font-size="12">React shell + router</text>
+  <path d="M315 214 H390" stroke="#789389" stroke-width="2"/>
+  <path d="M382 207 L390 214 L382 221" fill="none" stroke="#789389" stroke-width="2"/>
+  <rect x="390" y="140" width="320" height="148" rx="8" fill="#172b24" stroke="#d9ff68"/>
+  <text x="416" y="180" fill="#d9ff68" font-family="Arial, sans-serif" font-size="14" font-weight="700">SHARED WEBGL RUNTIME</text>
+  <text x="416" y="226" fill="#eff8f2" font-family="Arial, sans-serif" font-size="32" font-weight="700">948.32 KB</text>
+  <text x="416" y="254" fill="#afc2ba" font-family="Arial, sans-serif" font-size="13">Three.js + R3F + Drei + shared World</text>
+  <path d="M710 192 H790 V166 H850" fill="none" stroke="#789389" stroke-width="2"/>
+  <path d="M842 159 L850 166 L842 173" fill="none" stroke="#789389" stroke-width="2"/>
+  <path d="M710 238 H790 V302 H850" fill="none" stroke="#789389" stroke-width="2"/>
+  <path d="M842 295 L850 302 L842 309" fill="none" stroke="#789389" stroke-width="2"/>
+  <rect x="850" y="118" width="280" height="98" rx="8" fill="#10211b" stroke="#496158"/>
+  <text x="874" y="153" fill="#d9ff68" font-family="Arial, sans-serif" font-size="14" font-weight="700">DRIVE ROUTE</text>
+  <text x="874" y="188" fill="#eff8f2" font-family="Arial, sans-serif" font-size="24" font-weight="700">27.52 KB</text>
+  <rect x="850" y="254" width="280" height="98" rx="8" fill="#10211b" stroke="#496158"/>
+  <text x="874" y="289" fill="#d9ff68" font-family="Arial, sans-serif" font-size="14" font-weight="700">MANIPULATOR ROUTE</text>
+  <text x="874" y="324" fill="#eff8f2" font-family="Arial, sans-serif" font-size="24" font-weight="700">2.70 KB</text>
+  <text x="70" y="410" fill="#75efb0" font-family="Arial, sans-serif" font-size="14" font-weight="700">Key reading:</text>
+  <text x="162" y="410" fill="#afc2ba" font-family="Arial, sans-serif" font-size="14">lazy routes reduce page-specific code, while the reusable WebGL engine remains the dominant shared dependency.</text>
+  <text x="70" y="442" fill="#526b61" font-family="Arial, sans-serif" font-size="13">Values are uncompressed production output and may shift slightly as source code changes.</text>
+</svg>
