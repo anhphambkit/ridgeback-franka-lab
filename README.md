@@ -1,75 +1,71 @@
-# React + TypeScript + Vite
+# Ridgeback / Franka Robotics Lab
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interactive React + Three.js demonstration using the supplied `ridgeback_franka.glb`.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Differential-drive controls with arrow keys, velocity limits, acceleration ramps, trail, telemetry, and renderer statistics.
+- Physical left/right wheel angular velocities derived from wheel radius and axle track.
+- Six-joint forward-kinematics controls using the GLB's preserved node hierarchy.
+- Responsive two-page interface with orbit controls.
+- Pure, unit-tested drive integration logic.
+- Design notes for [emergency stopping](docs/EMERGENCY_STOP.md) and [instancing](docs/INSTANCING.md).
+- A measured [performance review](docs/PERFORMANCE.md) with baseline and optimized results.
 
-## React Compiler
+## Run locally
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Quality checks:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm test
+npm run lint
+npm run build
 ```
+
+The JS heap metric is only exposed by browsers that implement `performance.memory` (primarily Chromium); other browsers display `N/A`.
+
+## Differential-drive model
+
+The operator commands a linear velocity `v` and yaw rate `ω`. The simulation ramps both commands with acceleration limits, converts them into wheel angular speeds, and then integrates the recovered base twist:
+
+```text
+leftWheel  = (v - ω × track / 2) / radius
+rightWheel = (v + ω × track / 2) / radius
+v          = radius × (rightWheel + leftWheel) / 2
+ω          = radius × (rightWheel - leftWheel) / track
+```
+
+Current demo parameters are a `0.13 m` wheel radius and `0.58 m` axle track. Wheels are intentionally not rendered because the assessment model omits them, but both wheel speeds are shown in telemetry.
+
+## Manipulator scope
+
+The supplied GLB contains the chain `Link1 → ... → Link7 → Hand`, while the assessment explicitly requests a 6-DOF manipulator. This implementation therefore exposes `Link1` through `Link6` as the six adjustable joints; `Link7` remains the fixed terminal link before the hand.
+
+Joint axes and limits are explicit configuration in `src/config/joints.ts`. The GLB preserves node hierarchy but does not contain URDF-style revolute-axis or limit metadata, so these values must be visually validated against the intended robot definition when integrating with a physical/authoritative model.
+
+## Performance decisions
+
+- Route-level lazy loading separates the drive and manipulator UI.
+- The GLB is Meshopt-compressed without flattening or joining nodes, preserving the kinematic hierarchy. The original 11.09 MB source remains in the repository; the runtime asset is about 2.89 MB.
+- Pixel ratio is capped at 1.5 and the canvas requests the high-performance GPU preference.
+- Static hemisphere/directional lighting avoids loading a remote HDR environment.
+- Telemetry and renderer statistics update at 10 Hz rather than every animation frame.
+- Trajectory sampling is distance/time throttled and capped at 1,500 points.
+- The renderer panel exposes FPS and smoothed frame time alongside WebGL counters.
+
+Rebuild the optimized asset after replacing the source GLB:
+
+```bash
+npm run optimize:model
+```
+
+The optimization command deliberately disables scene flattening, mesh joining, and automatic instancing because those transforms can destroy or obscure the articulated link hierarchy required for forward kinematics.
+
+## Visual design
+
+The interface is a custom design for this project rather than a downloaded template. Its direction is an industrial robotics control panel: deep green-black surfaces, lime safety accents, a technical grid, glass telemetry cards, Manrope for readable UI copy, and DM Mono for machine data.
