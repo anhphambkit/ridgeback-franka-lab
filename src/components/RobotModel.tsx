@@ -1,13 +1,16 @@
 import { useGLTF } from '@react-three/drei'
 import { useEffect, useMemo } from 'react'
-import { AxesHelper, Object3D, Quaternion } from 'three'
+import { AxesHelper, Box3, Matrix4, Object3D, Quaternion, Vector3 } from 'three'
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import modelUrl from '../../ridgeback_franka.optimized.glb?url'
-import { JOINTS, normalizeJointPose, type JointPose } from '../config/joints'
+import { JOINTS, gripperFingerPositionMeters, normalizeJointPose, type JointPose } from '../config/joints'
+import { findOwnedVisualMesh } from '../lib/robotColliders'
 
-type Props = { joints?: JointPose, showJointAxes?: boolean }
+type Props = { joints?: JointPose, gripperWidthMm?: number, showJointAxes?: boolean }
 
-export function RobotModel({ joints, showJointAxes = false }: Props) {
+const LEFT_FINGER_ORIENTATION_CORRECTION = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), Math.PI)
+
+export function RobotModel({ joints, gripperWidthMm = 0, showJointAxes = false }: Props) {
   const gltf = useGLTF(modelUrl)
   const model = useMemo(() => {
     const scene = clone(gltf.scene)
@@ -23,7 +26,28 @@ export function RobotModel({ joints, showJointAxes = false }: Props) {
       part.add(axes)
       jointAxesHelpers.push(axes)
     })
-    return { scene, restQuaternions, jointAxesHelpers }
+
+    const leftFinger = scene.getObjectByName('LeftFinger')
+    const rightFinger = scene.getObjectByName('RightFinger')
+    const hand = scene.getObjectByName('Hand')
+    if (!hand || !leftFinger || !rightFinger) throw new Error('Robot model is missing gripper nodes')
+
+    leftFinger.quaternion.multiply(LEFT_FINGER_ORIENTATION_CORRECTION)
+    scene.updateMatrixWorld(true)
+
+    const handInverse = new Matrix4().copy(hand.matrixWorld).invert()
+    const leftBounds = new Box3().setFromObject(leftFinger).applyMatrix4(handInverse)
+    const rightBounds = new Box3().setFromObject(rightFinger).applyMatrix4(handInverse)
+    const handVisual = findOwnedVisualMesh(hand)
+    if (!handVisual) throw new Error('Robot model is missing the Hand visual mesh')
+    const handBounds = new Box3().setFromObject(handVisual).applyMatrix4(handInverse)
+    const gripperCenterMeters = (handBounds.min.z + handBounds.max.z) / 2
+    const fingerInnerOffsets = new Map([
+      ['LeftFinger', leftBounds.min.z - leftFinger.position.z],
+      ['RightFinger', rightBounds.max.z - rightFinger.position.z],
+    ])
+
+    return { scene, restQuaternions, jointAxesHelpers, gripperCenterMeters, fingerInnerOffsets }
   }, [gltf.scene])
 
   useEffect(() => {
@@ -40,7 +64,23 @@ export function RobotModel({ joints, showJointAxes = false }: Props) {
       const jointRotation = new Quaternion().setFromAxisAngle(axis, angle)
       part.quaternion.copy(rest).multiply(jointRotation)
     })
-  }, [joints, showJointAxes, model])
+
+    ;([
+      ['LeftFinger', 1],
+      ['RightFinger', -1],
+    ] as const).forEach(([node, direction]) => {
+      const finger = model.scene.getObjectByName(node)
+      const innerOffset = model.fingerInnerOffsets.get(node)
+      if (!finger || innerOffset === undefined) return
+      finger.position.z = gripperFingerPositionMeters(
+        gripperWidthMm,
+        model.gripperCenterMeters,
+        innerOffset,
+        direction,
+      )
+    })
+    model.scene.updateMatrixWorld(true)
+  }, [joints, gripperWidthMm, showJointAxes, model])
 
   return <primitive object={model.scene as Object3D} />
 }

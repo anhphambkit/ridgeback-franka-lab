@@ -1,6 +1,6 @@
 import { MathUtils, Vector3 } from 'three'
 
-export type JointPose = [number, number, number, number, number, number]
+export type JointPose = [number, number, number, number, number, number, number]
 
 // Keep slider values on a clean 0.1° grid while staying inside the official
 // radian limits (ceil lower bounds, floor upper bounds).
@@ -50,10 +50,44 @@ export const JOINTS = [
     min: lowerDegrees(-0.0175),
     max: upperDegrees(3.7525),
   },
+  {
+    node: 'Link7',
+    label: 'Joint 7 · Tool swivel',
+    axis: new Vector3(0, -1, 0),
+    min: lowerDegrees(-2.8973),
+    max: upperDegrees(2.8973),
+  },
 ] as const
 
-export const HOME_POSE: JointPose = [0, 0, 0, -45, 0, 90]
-export const DEMO_POSE: JointPose = [35, -40, 60, -110, 45, 120]
+export const HOME_POSE: JointPose = [0, 0, 0, -45, 0, 90, 0]
+export const DEMO_POSE: JointPose = [35, -40, 60, -110, 45, 120, -35]
+
+export const GRIPPER = {
+  minWidthMm: 0,
+  // The supplied visual Hand is about 204 mm wide and each finger is about
+  // 26 mm thick, leaving roughly 151 mm of model-calibrated travel.
+  maxWidthMm: 150,
+  homeWidthMm: 0,
+} as const
+
+export function normalizeGripperWidth(widthMm: number): number {
+  return MathUtils.clamp(
+    Number.isFinite(widthMm) ? widthMm : GRIPPER.homeWidthMm,
+    GRIPPER.minWidthMm,
+    GRIPPER.maxWidthMm,
+  )
+}
+
+export function gripperFingerPositionMeters(
+  widthMm: number,
+  gripperCenterMeters: number,
+  innerSurfaceOffsetFromNodeMeters: number,
+  direction: -1 | 1,
+): number {
+  const halfGapMeters = normalizeGripperWidth(widthMm) / 2000
+  const targetInnerSurface = gripperCenterMeters + direction * halfGapMeters
+  return targetInnerSurface - innerSurfaceOffsetFromNodeMeters
+}
 
 export function normalizeJointPose(pose: readonly number[]): JointPose {
   return JOINTS.map((joint, index) => {
