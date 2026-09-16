@@ -6,7 +6,7 @@ Interactive React + Three.js demonstration using the supplied `ridgeback_franka.
 
 - Differential-drive controls with keyboard and touch input, velocity limits, acceleration ramps, camera follow, trail, telemetry, and renderer statistics.
 - Physical left/right wheel angular velocities derived from wheel radius and axle track.
-- Validated six-joint forward-kinematics controls using the GLB's preserved node hierarchy.
+- Validated six-joint forward-kinematics controls with corrected local axes and toggleable joint helpers using the GLB's preserved node hierarchy.
 - Responsive two-page interface with orbit controls.
 - Pure, unit-tested drive integration logic.
 - Design notes for [emergency stopping](docs/EMERGENCY_STOP.md) and [instancing](docs/INSTANCING.md).
@@ -76,7 +76,7 @@ Current demo parameters are a `0.13 m` wheel radius and `0.58 m` axle track. Whe
 
 ## Manipulator scope
 
-The supplied GLB contains the chain `Link1 → ... → Link7 → Hand`, while the assessment explicitly requests a 6-DOF manipulator. This implementation therefore exposes `Link1` through `Link6` as the six adjustable joints; `Link7` remains the fixed terminal link before the hand.
+The supplied GLB contains the chain `Link1 → ... → Link7 → Hand`, while the assessment explicitly requests a 6-DOF manipulator. This implementation therefore exposes `Link1` through `Link6` as the six adjustable joints; `Link7` remains the fixed terminal link before the hand. A toggleable local `AxesHelper` is attached to every configured pivot for visual verification.
 
 Joint axes and limits are explicit configuration in `src/config/joints.ts`. The GLB preserves node hierarchy but does not contain URDF-style revolute-axis or limit metadata, so these values must be visually validated against the intended robot definition when integrating with a physical/authoritative model.
 

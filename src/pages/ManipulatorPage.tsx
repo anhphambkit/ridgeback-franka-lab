@@ -7,7 +7,9 @@ import { SceneBoundary } from '../components/SceneBoundary'
 import { DEMO_POSE, HOME_POSE, JOINTS, normalizeJointPose, type JointPose } from '../config/joints'
 import { World } from '../components/World'
 
-function ManipulatorScene({ joints }: { joints: JointPose }) {
+const formatAngle = (value: number) => value.toFixed(1)
+
+function ManipulatorScene({ joints, showJointAxes }: { joints: JointPose, showJointAxes: boolean }) {
   const robot = useRef<Group>(null)
   const [tip, setTip] = useState<[number, number, number]>([0, 0, 0])
   const signature = joints.join(',')
@@ -23,13 +25,14 @@ function ManipulatorScene({ joints }: { joints: JointPose }) {
   }, [signature])
 
   return <group ref={robot}>
-    <RobotModel joints={joints} />
+    <RobotModel joints={joints} showJointAxes={showJointAxes} />
     <Html position={[0, 1.6, 0]} center distanceFactor={8} className="model-tag">6-DOF CHAIN · TCP {tip.map((v) => v.toFixed(2)).join(' / ')}</Html>
   </group>
 }
 
 export function ManipulatorPage() {
   const [joints, setJoints] = useState<JointPose>(() => [...HOME_POSE])
+  const [showJointAxes, setShowJointAxes] = useState(true)
   const updateJoint = (index: number, value: number) => setJoints((current) => {
     const next = [...current]
     next[index] = value
@@ -41,11 +44,15 @@ export function ManipulatorPage() {
       <p className="eyebrow">Forward kinematics</p>
       <h1>Six axes.<br /><em>One chain.</em></h1>
       <p className="lede">Adjust each local joint rotation. Child links inherit every upstream transform in the GLB hierarchy.</p>
+      <label className="camera-toggle axes-toggle">
+        <input type="checkbox" checked={showJointAxes} onChange={(event) => setShowJointAxes(event.target.checked)} />
+        Joint axes <small>X red · Y green · Z blue</small>
+      </label>
       <div className="joint-list">
         {JOINTS.map((joint, index) => <label key={joint.node}>
-          <span>{joint.label}<output>{joints[index]}°</output></span>
-          <input type="range" min={joint.min} max={joint.max} step="1" value={joints[index]} onChange={(event) => updateJoint(index, Number(event.target.value))} />
-          <small>{joint.min}° <i /> {joint.max}°</small>
+          <span>{joint.label}<output>{formatAngle(joints[index]!)}°</output></span>
+          <input type="range" min={joint.min} max={joint.max} step="0.1" value={joints[index]} onChange={(event) => updateJoint(index, Number(event.target.value))} />
+          <small>{formatAngle(joint.min)}° <i /> {formatAngle(joint.max)}°</small>
         </label>)}
       </div>
       <div className="button-row">
@@ -56,7 +63,7 @@ export function ManipulatorPage() {
     <div className="viewport-wrap">
       <SceneBoundary>
         <Canvas dpr={[1, 1.5]} camera={{ position: [3.4, 2.8, -4.2], fov: 38 }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
-          <Suspense fallback={<Html center className="scene-loader">Loading robot</Html>}><World><ManipulatorScene joints={joints} /></World></Suspense>
+          <Suspense fallback={<Html center className="scene-loader">Loading robot</Html>}><World><ManipulatorScene joints={joints} showJointAxes={showJointAxes} /></World></Suspense>
         </Canvas>
       </SceneBoundary>
       <div className="viewport-label">LIVE / ARM_FK</div>

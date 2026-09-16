@@ -8,6 +8,17 @@ describe('joint configuration', () => {
     JOINTS.forEach((joint) => expect(joint.axis.length()).toBeCloseTo(1))
   })
 
+  it('maps the URDF joint axes into the GLB Y-up frame', () => {
+    expect(JOINTS.map((joint) => joint.axis.toArray())).toEqual([
+      [0, 1, 0],
+      [0, 0, -1],
+      [0, 1, 0],
+      [0, 0, 1],
+      [0, 1, 0],
+      [0, 0, 1],
+    ])
+  })
+
   it('clamps every angle to its configured limits', () => {
     const input = [999, -999, 999, 999, -999, 999]
     const pose = normalizeJointPose(input)
