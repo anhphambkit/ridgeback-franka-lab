@@ -6,11 +6,12 @@ Interactive React + Three.js demonstration using the supplied `ridgeback_franka.
 
 - Differential-drive controls with keyboard and touch input, velocity limits, acceleration ramps, camera follow, trail, telemetry, and renderer statistics.
 - Physical left/right wheel angular velocities derived from wheel radius and axle track.
-- Validated seven-joint forward-kinematics controls and a centered 0–150 mm model-calibrated gripper using the GLB's preserved node hierarchy.
+- Validated seven-joint forward-kinematics controls, pose-dependent visual collision limits, and a symmetric 0–150 mm model-calibrated gripper using the GLB's preserved node hierarchy.
 - Responsive two-page interface with orbit controls.
 - Pure, unit-tested drive integration logic.
 - Design notes for [emergency stopping](docs/EMERGENCY_STOP.md) and [instancing](docs/INSTANCING.md).
 - A measured [performance review](docs/PERFORMANCE.md) with baseline and optimized results.
+- A [GLB model audit](docs/GLB_MODEL_AUDIT.md) documenting the hierarchy, joint-axis/limit provenance, gripper calibration, and collision-limit method.
 ## Screenshots
 
 ### Mobile base simulation
@@ -76,9 +77,16 @@ Current demo parameters are a `0.13 m` wheel radius and `0.58 m` axle track. Whe
 
 ## Manipulator scope
 
-The supplied GLB contains the chain `Link1 → ... → Link7 → Hand`, matching the physical Franka arm's seven revolute joints. This implementation exposes all seven pivots and provides a toggleable local `AxesHelper` at every joint. `LeftFinger` is rotated 180° around its long local Y axis so the pads oppose each other, then both fingers are centered on the measured Hand mesh and move symmetrically through a 0–150 mm visual range fitted to this asset.
+The supplied GLB contains the chain `Link1 → ... → Link7 → Hand`, matching the physical Franka arm's seven revolute joints. This implementation exposes all seven pivots, provides a toggleable local `AxesHelper` at every joint, and moves the `LeftFinger` and `RightFinger` nodes symmetrically along their Hand-local Z axis. The two supplied finger meshes share the same orientation, so `LeftFinger` is rotated 180° around its long local Y axis to make the pads oppose each other. The command is centered on the measured Hand mesh and uses a 0–150 mm visual range fitted to this asset.
 
-Joint axes and limits are explicit configuration in `src/config/joints.ts`. The GLB preserves node hierarchy but does not contain URDF-style revolute-axis or limit metadata, so these values must be visually validated against the intended robot definition when integrating with a physical/authoritative model.
+Joint axes and mechanical limits are explicit configuration in `src/config/joints.ts`. The GLB preserves node hierarchy but does not contain URDF-style revolute-axis or limit metadata, so these values must be visually validated against the intended robot definition when integrating with a physical/authoritative model.
+
+Each slider is further narrowed from the current complete pose by sweeping that
+joint against oriented bounding boxes generated from the visual meshes. This
+makes limits depend dynamically on all other joint angles without maintaining a
+manual table of joint-pair ranges. It is a lightweight visual-demo guard, not a
+safety-certified collision model; see the model audit for the exclusions and
+production limitations.
 
 ## Performance decisions
 

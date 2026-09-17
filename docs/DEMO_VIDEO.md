@@ -18,7 +18,7 @@ Record a 60–90 second walkthrough after `npm test`, `npm run lint`, and `npm r
 | 0:08–0:22 | Hold Up, release it, then hold Down. | “The differential-drive base follows acceleration ramps and never exceeds the configured linear and angular limits.” |
 | 0:22–0:32 | Hold Left and Right; point out heading and wheel velocities. | “Rotation is driven by opposite wheel-speed contributions, while pose and velocity telemetry update at 10 hertz.” |
 | 0:32–0:40 | Show the trajectory, renderer panel, and press Reset. | “The trail is distance- and time-sampled, and the renderer panel reports draw calls, geometries, triangles, frame time, FPS, and browser heap usage.” |
-| 0:40–0:55 | Navigate to Manipulator; adjust two or three sliders. | “Six configured local joints drive forward kinematics through the preserved GLB parent-child hierarchy.” |
+| 0:40–0:55 | Navigate to Manipulator; adjust two or three joint sliders and the gripper. | “Seven configured local joints drive forward kinematics through the preserved GLB parent-child hierarchy, while the two fingers open symmetrically.” |
 | 0:55–1:05 | Press Demo pose, then Home pose; point out TCP changes. | “The TCP is read from the Hand node in world space after all upstream transforms are applied.” |
 | 1:05–1:15 | Briefly show the README links to E-stop, instancing, and performance docs. | “The repository also documents collision-safe emergency stopping, articulated-model instancing, and measured optimization decisions.” |
 

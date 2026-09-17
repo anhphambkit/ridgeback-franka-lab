@@ -21,6 +21,7 @@ describe('findOwnedVisualMesh', () => {
     const rearLaser = mesh('RearLaser')
     const baseVisual = mesh('Base_1')
     base.add(frontLaser, new Group(), rearLaser, baseVisual)
+
     expect(findOwnedVisualMesh(base)).toBe(baseVisual)
   })
 
@@ -31,6 +32,7 @@ describe('findOwnedVisualMesh', () => {
     const rightFinger = mesh('RightFinger')
     const handVisual = mesh('Hand_1')
     hand.add(leftFinger, rightFinger, handVisual)
+
     expect(findOwnedVisualMesh(hand)).toBe(handVisual)
   })
 
@@ -38,6 +40,7 @@ describe('findOwnedVisualMesh', () => {
     const pivot = new Group()
     pivot.name = 'Unknown'
     pivot.add(mesh('PartA'), mesh('PartB'))
+
     expect(findOwnedVisualMesh(pivot)).toBeUndefined()
   })
 })
